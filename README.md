@@ -1,3 +1,3 @@
 # Low_Level_Design_Solutions
 
-Collection of Java low-level design practice projects.
+Repository containing Low Level Design (LLD) solutions, machine coding exercises, and design pattern implementations in Java for SDE interview preparation.
