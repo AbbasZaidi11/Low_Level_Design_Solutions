@@ -1,88 +1,47 @@
 package org.example;
 
-import org.example.context.Item;
-import org.example.context.ItemShelf;
-import org.example.context.ItemType;
-import org.example.context.VendingMachine;
+import org.example.context.*;
 import org.example.vendingmachinestates.Coin;
-import org.example.vendingmachinestates.State;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class VendingMachineAppDemo {
-    public static void main(String args[]){
-        VendingMachine vendingMachine = new VendingMachine();
+
+    public static void main(String[] args) {
+
         try {
-            System.out.println("|");
-            System.out.println("filling up the inventory");
-            System.out.println("|");
+            VendingMachine machine = new VendingMachine();
 
-            fillUpInventory(vendingMachine);
-            displayInventory(vendingMachine);
+            // ---------------- Fill Inventory ----------------
+            Item coke = new Item();
+            coke.setType(ItemType.COKE);
+            coke.setPrice(30);
 
-            System.out.println("|");
-            System.out.println("clicking on InsertCoinButton");
-            System.out.println("|");
+            Item pepsi = new Item();
+            pepsi.setType(ItemType.PEPSI);
+            pepsi.setPrice(20);
 
-            State vendingState = vendingMachine.getVendingMachineState();
-            vendingState.clickOnInsertCoinButton(vendingMachine);
+            // Machine starts in IdleState
+            machine.getVendingMachineState().updateInventory(machine, coke, 101);
+            machine.getVendingMachineState().updateInventory(machine, pepsi, 102);
 
-            vendingState = vendingMachine.getVendingMachineState();
-            vendingState.insertCoin(vendingMachine, Coin.NICKEL);
-            vendingState.insertCoin(vendingMachine, Coin.QUARTER);
-            // vendingState.insertCoin(vendingMachine, Coin.NICKEL);
+            // ---------------- Customer starts transaction ----------------
 
-            System.out.println("|");
-            System.out.println("clicking on ProductSelectionButton");
-            System.out.println("|");
-            vendingState.clickOnStartProductSelectionButton(vendingMachine);
+            // Press Insert Coin button
+            machine.getVendingMachineState().clickOnInsertCoinButton(machine);
 
-            vendingState = vendingMachine.getVendingMachineState();
-            vendingState.chooseProduct(vendingMachine, 102);
+            // Insert coins
+            machine.getVendingMachineState().insertCoin(machine, Coin.QUARTER); // 25
+            machine.getVendingMachineState().insertCoin(machine, Coin.NICKEL);  // 5
 
-            displayInventory(vendingMachine);
+            // Total = 30
 
-        }
-        catch (Exception e){
-            displayInventory(vendingMachine);
-        }
+            // Press Select Product button
+            machine.getVendingMachineState().clickOnStartProductSelectionButton(machine);
 
+            // Select Coke
+            machine.getVendingMachineState().chooseProduct(machine, 101);
 
-    }
-
-    private static void fillUpInventory(VendingMachine vendingMachine){
-        ItemShelf[] slots = vendingMachine.getInventory().getInventory();
-        for (int i = 0; i < slots.length; i++) {
-            Item newItem = new Item();
-            if(i >=0 && i<3) {
-                newItem.setType(ItemType.COKE);
-                newItem.setPrice(12);
-            }else if(i >=3 && i<5){
-                newItem.setType(ItemType.PEPSI);
-                newItem.setPrice(9);
-            }else if(i >=5 && i<7){
-                newItem.setType(ItemType.JUICE);
-                newItem.setPrice(13);
-            }else if(i >=7 && i<10){
-                newItem.setType(ItemType.SODA);
-                newItem.setPrice(7);
-            }
-            slots[i].setItem(newItem);
-            slots[i].setSoldOut(false);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
-
-    private static void displayInventory(VendingMachine vendingMachine){
-
-        ItemShelf[] slots = vendingMachine.getInventory().getInventory();
-        for (int i = 0; i < slots.length; i++) {
-
-            System.out.println("CodeNumber: " + slots[i].getCode() +
-                    " Item: " + slots[i].getItem().getType().name() +
-                    " Price: " + slots[i].getItem().getPrice() +
-                    " isAvailable: " + !slots[i].isSoldOut());
-        }
-    }
-
 }
-

@@ -26,8 +26,12 @@ public class CashWithdrawalState extends ATMState {
 
             //using chain of responsibility for this logic, how many 2k Rs notes, how many 500 Rs notes etc, has to be withdrawal
             CashWithdrawProcessor withdrawProcessor =
-                    new TwoThousandWithdrawProcessor(new FiveHundredWithdrawProcessor(new OneHundredWithdrawProcessor(null)));
-
+                    new TwoThousandWithdrawProcessor(
+                            new FiveHundredWithdrawProcessor(
+                                    new OneHundredWithdrawProcessor(null
+                                    )
+                            )
+                    );
             withdrawProcessor.withdraw(atmObject, withdrawalAmountRequest);
             exit(atmObject);
         }

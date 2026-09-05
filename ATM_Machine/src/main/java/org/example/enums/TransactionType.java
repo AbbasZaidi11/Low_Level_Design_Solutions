@@ -1,6 +1,6 @@
 package org.example.enums;
 
-public enum  TransactionType {
+public enum TransactionType {
 
     CASH_WITHDRAWAL,
     BALANCE_CHECK;

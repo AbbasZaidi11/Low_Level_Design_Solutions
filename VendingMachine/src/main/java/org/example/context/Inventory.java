@@ -9,21 +9,13 @@ public class Inventory {
         initialEmptyInventory();
     }
 
-    public ItemShelf[] getInventory() {
-        return inventory;
-    }
-
-    public void setInventory(ItemShelf[] inventory) {
-        this.inventory = inventory;
-    }
-
     public void initialEmptyInventory() {
         int startCode = 101;
         for (int i = 0; i < inventory.length; i++) {
             ItemShelf space = new ItemShelf();
             space.setCode(startCode);
             space.setSoldOut(true);
-            inventory[i]= space;
+            inventory[i] = space;
             startCode++;
         }
     }
@@ -49,7 +41,6 @@ public class Inventory {
                 if (itemShelf.isSoldOut()) {
                     throw new Exception("item already sold out");
                 } else {
-
                     return itemShelf.item;
                 }
             }
@@ -57,11 +48,20 @@ public class Inventory {
         throw new Exception("Invalid Code");
     }
 
-    public void updateSoldOutItem(int codeNumber){
+    public void updateSoldOutItem(int codeNumber) {
         for (ItemShelf itemShelf : inventory) {
             if (itemShelf.code == codeNumber) {
                 itemShelf.setSoldOut(true);
             }
         }
     }
+
+    public ItemShelf[] getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(ItemShelf[] inventory) {
+        this.inventory = inventory;
+    }
+
 }

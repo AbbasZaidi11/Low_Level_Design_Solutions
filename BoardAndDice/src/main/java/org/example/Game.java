@@ -36,7 +36,7 @@ public class Game {
             //roll the dice
             int diceNumbers = dice.rollDice();
 
-            //get the new position
+            //get the new position;
             int playerNewPosition = playerTurn.currentPosition + diceNumbers;
             playerNewPosition = jumpCheck(playerNewPosition);
             playerTurn.currentPosition = playerNewPosition;
