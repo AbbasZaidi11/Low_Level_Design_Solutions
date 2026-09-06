@@ -33,7 +33,7 @@ public class UserDao {
     }
 
     public void addEvent(User user, Event event){
-        user.getEvents().add(event);
+        user.addEvent(event);
     }
 
 }

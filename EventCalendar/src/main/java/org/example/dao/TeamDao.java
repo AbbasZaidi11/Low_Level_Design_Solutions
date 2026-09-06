@@ -26,6 +26,10 @@ public class TeamDao {
         return teamMap.get(teamName);
     }
 
+    public boolean exists(String teamName) {
+        return teamMap.containsKey(teamName);
+    }
+
 
 
 }

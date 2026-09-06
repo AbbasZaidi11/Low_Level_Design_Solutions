@@ -1,23 +1,35 @@
 package org.example.models;
 
+import java.time.LocalTime;
+import java.util.Collections;
+import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.TreeSet;
 
 public class User extends Participant {
 
-    private TimeSlot workingHours;
+    private final LocalTime workingHoursStart;
+    private final LocalTime workingHoursEnd;
     private Optional<Team> team;
-    private TreeSet<Event> events;
+    private final TreeSet<Event> events;
 
-    public User(String name, TimeSlot workingHours) {
+    public User(String name, LocalTime workingHoursStart, LocalTime workingHoursEnd) {
         super(name);
-        this.workingHours = workingHours;
+        if (workingHoursStart == null || workingHoursEnd == null || !workingHoursStart.isBefore(workingHoursEnd)) {
+            throw new IllegalArgumentException("Working-hours start must be before end");
+        }
+        this.workingHoursStart = workingHoursStart;
+        this.workingHoursEnd = workingHoursEnd;
         this.team = Optional.empty();
         this.events = new TreeSet<>();
     }
 
-    public TimeSlot getWorkingHours() {
-        return workingHours;
+    public LocalTime getWorkingHoursStart() {
+        return workingHoursStart;
+    }
+
+    public LocalTime getWorkingHoursEnd() {
+        return workingHoursEnd;
     }
 
     public Optional<Team> getTeam() {
@@ -28,9 +40,11 @@ public class User extends Participant {
         this.team = Optional.of(team);
     }
 
-    public TreeSet<Event> getEvents() {
-        return events;
+    public NavigableSet<Event> getEvents() {
+        return Collections.unmodifiableNavigableSet(events);
     }
 
-
+    public void addEvent(Event event) {
+        events.add(event);
+    }
 }

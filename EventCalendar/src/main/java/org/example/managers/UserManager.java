@@ -3,8 +3,9 @@ package org.example.managers;
 import org.example.dao.UserDao;
 import org.example.models.Event;
 import org.example.models.Team;
-import org.example.models.TimeSlot;
 import org.example.models.User;
+
+import java.time.LocalTime;
 
 public class UserManager {
 
@@ -14,8 +15,11 @@ public class UserManager {
         this.userDao = new UserDao();
     }
 
-    public User createUser(String username, TimeSlot timeSlot) {
-        User newUser = new User(username, timeSlot);
+    public User createUser(String username, LocalTime workingHoursStart, LocalTime workingHoursEnd) {
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("User name is required");
+        }
+        User newUser = new User(username, workingHoursStart, workingHoursEnd);
         userDao.addUser(newUser);
         return newUser;
     }

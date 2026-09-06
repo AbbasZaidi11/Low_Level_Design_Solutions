@@ -7,7 +7,9 @@ import org.example.models.Event;
 import org.example.models.TimeSlot;
 import org.example.models.User;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public class EventCalendar {
@@ -21,24 +23,25 @@ public class EventCalendar {
         eventManager = new EventManager(userManager, teamManager);
     }
 
-    public void createUser(String name, Date startTime, Date endTime) {
-        TimeSlot workingHours = new TimeSlot(startTime, endTime);
-        userManager.createUser(name, workingHours);
+    public User createUser(String name, LocalTime startTime, LocalTime endTime) {
+        return userManager.createUser(name, startTime, endTime);
     }
 
     public void createTeam(String name, List<String> userNames) {
         teamManager.createTeam(name, userNames);
     }
 
-    public void createEvent(String eventName, List<String> userNames, List<String> teamNames, int rep, Date startTime, Date endTime) {
-        eventManager.createEvent(eventName, userNames, teamNames, rep, startTime, endTime);
+    public Event createEvent(String eventName, List<String> userNames, List<String> teamNames, int rep,
+                             LocalDateTime startTime, LocalDateTime endTime) {
+        return eventManager.createEvent(eventName, userNames, teamNames, rep, startTime, endTime);
     }
 
-    public void printUser(String userId) {
-        User user = userManager.getUser(userId);
+    public List<Event> getEventsForUser(String userId, LocalDateTime from, LocalDateTime to) {
+        return eventManager.getEventsForUser(userId, from, to);
+    }
 
-        for (Event event : user.getEvents()) {
-            System.out.println(userId + " - " + event.getName() + " - " + event.getTimeSlot().getStartTime() + " - " + event.getTimeSlot().getEndTime());
-        }
+    public List<TimeSlot> suggestAvailableSlots(List<String> userNames, List<String> teamNames, int representatives,
+                                                 LocalDate date) {
+        return eventManager.suggestAvailableSlots(userNames, teamNames, representatives, date);
     }
 }

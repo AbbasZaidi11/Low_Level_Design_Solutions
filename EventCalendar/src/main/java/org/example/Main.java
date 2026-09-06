@@ -1,49 +1,62 @@
 package org.example;
 
 import org.example.app.EventCalendar;
+import org.example.models.Event;
+import org.example.models.TimeSlot;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 
 public class Main {
+    public static void main(String[] args) {
+        EventCalendar calendar = new EventCalendar();
+        LocalDate today = LocalDate.of(2026, 9, 6);
+        LocalDate tomorrow = today.plusDays(1);
 
-    public static void main(String args[]) throws IOException, ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        EventCalendar eventCalendar = new EventCalendar();
+        calendar.createUser("A", LocalTime.of(10, 0), LocalTime.of(19, 0));
+        calendar.createUser("B", LocalTime.of(9, 30), LocalTime.of(17, 30));
+        calendar.createUser("C", LocalTime.of(11, 30), LocalTime.of(18, 30));
+        calendar.createUser("D", LocalTime.of(10, 0), LocalTime.of(18, 0));
+        calendar.createUser("E", LocalTime.of(11, 0), LocalTime.of(19, 30));
+        calendar.createUser("F", LocalTime.of(11, 0), LocalTime.of(18, 30));
+        calendar.createTeam("T1", List.of("C", "E"));
+        calendar.createTeam("T2", List.of("B", "D", "F"));
 
-        eventCalendar.createUser("A", dateFormat.parse("2021-07-07 9:00:00"), dateFormat.parse("2021-07-07 21:00:00"));
-        eventCalendar.createUser("B", dateFormat.parse("2021-07-07 9:00:00"), dateFormat.parse("2021-07-07 21:00:00"));
-        eventCalendar.createUser("C", dateFormat.parse("2021-07-07 9:00:00"), dateFormat.parse("2021-07-07 21:00:00"));
+        calendar.createEvent("Event1", List.of("A"), List.of("T1"), 2,
+                tomorrow.atTime(14, 0), tomorrow.atTime(15, 0));
+        expectFailure("overlapping selected representative", () -> calendar.createEvent("Event2", List.of("C"), List.of(), 0,
+                tomorrow.atTime(14, 0), tomorrow.atTime(15, 0)));
+        calendar.createEvent("Event3", List.of(), List.of("T1", "T2"), 2,
+                today.atTime(15, 0), today.atTime(16, 0));
+        calendar.createEvent("Event4", List.of("A"), List.of("T2"), 1,
+                today.atTime(15, 0), today.atTime(16, 0));
+        expectFailure("outside F working hours", () -> calendar.createEvent("Event5", List.of("F"), List.of(), 0,
+                today.atTime(10, 0), today.atTime(11, 0)));
+        expectFailure("insufficient T1 representatives", () -> calendar.createEvent("Event6", List.of(), List.of("T1"), 2,
+                tomorrow.atTime(14, 0), tomorrow.atTime(15, 0)));
 
-        eventCalendar.createTeam("T1", Arrays.asList(new String[]{"A", "B"}));
-
-
-        eventCalendar.createEvent("E1", Arrays.asList("C"), Arrays.asList("T1"), 1,
-                dateFormat.parse("2021-07-07 13:00:00"), dateFormat.parse("2021-07-07 15:00:00"));
-
-//        eventCalendar.createEvent("E2", Collections.emptyList(), Arrays.asList("T1"), 1,
-//                dateFormat.parse("2021-07-07 13:00:00"), dateFormat.parse("2021-07-07 15:00:00"));
-
-
-        eventCalendar.printUser("A");
-        eventCalendar.printUser("B");
-        eventCalendar.printUser("C");
-
-        eventCalendar.createEvent("E1", Arrays.asList("C"), Arrays.asList("T1"), 1,
-                dateFormat.parse("2021-07-07 13:00:00"), dateFormat.parse("2021-07-07 15:00:00"));
-
-
-//        eventCalendar.createEvent("E3", Collections.emptyList(), Arrays.asList("T1"), 1,
-//                dateFormat.parse("2021-07-07 11:00:00"), dateFormat.parse("2021-07-07 13:00:00"));
-//
-//        eventCalendar.createEvent("E4", Collections.emptyList(), Arrays.asList("T1"), 2,
-//                dateFormat.parse("2021-07-07 15:00:00"), dateFormat.parse("2021-07-07 16:00:00"));
-//
-//        eventCalendar.createEvent("E5", Collections.emptyList(), Arrays.asList("T1"), 3,
-//                dateFormat.parse("2021-07-07 19:00:00"), dateFormat.parse("2021-07-07 20:00:00"));
-
+        System.out.println("A's events in range:");
+        printEvents(calendar.getEventsForUser("A", today.atTime(10, 0), tomorrow.atTime(17, 0)));
+        System.out.println("C's events (includes T1 selection):");
+        printEvents(calendar.getEventsForUser("C", today.atStartOfDay(), tomorrow.plusDays(1).atStartOfDay()));
+        System.out.println("Available slots for A + T1 (one representative) today:");
+        for (TimeSlot slot : calendar.suggestAvailableSlots(List.of("A"), List.of("T1"), 1, today)) {
+            System.out.println("  " + slot.getStartTime().toLocalTime() + " - " + slot.getEndTime().toLocalTime());
+        }
     }
 
+    private static void printEvents(List<Event> events) {
+        events.forEach(event -> System.out.println("  " + event.getName() + " " + event.getTimeSlot().getStartTime()
+                + " - " + event.getTimeSlot().getEndTime()));
+    }
+
+    private static void expectFailure(String scenario, Runnable action) {
+        try {
+            action.run();
+            throw new IllegalStateException("Expected failure did not occur: " + scenario);
+        } catch (IllegalArgumentException | IllegalStateException expected) {
+            System.out.println("Expected failure (" + scenario + "): " + expected.getMessage());
+        }
+    }
 }
